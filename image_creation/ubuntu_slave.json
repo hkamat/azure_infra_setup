@@ -1,0 +1,38 @@
+{
+    "builders": [{
+      "type": "azure-arm",
+  
+      "client_id": "738ce8f3-8871-412a-8bad-f7823edca24b",
+      "client_secret": "445054ba-b83a-43c3-b233-683c76aebb13",
+      "tenant_id": "3e5c4b15-4633-4de8-ba50-9e89a0be54fd",
+      "subscription_id": "3471d629-ae3b-4759-a4a5-cb7dd76faf87",
+  
+      "managed_image_resource_group_name": "TestRG",
+      "managed_image_name": "ubuntuSlaveImage",
+  
+      "os_type": "Linux",
+      "image_publisher": "Canonical",
+      "image_offer": "UbuntuServer",
+      "image_sku": "18.04-LTS",
+  
+      "azure_tags": {
+          "dept": "Engineering",
+          "task": "Image deployment"
+      },
+  
+      "location": "East US"
+    }],
+    "provisioners": [{
+      "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'",
+      "inline": [
+        "apt-get update",
+        "apt-get upgrade -y",
+        "apt install openjdk-8-jdk -y",
+        "apt install ansible",
+  
+        "/usr/sbin/waagent -force -deprovision+user && export HISTSIZE=0 && sync"
+      ],
+      "inline_shebang": "/bin/sh -x",
+      "type": "shell"
+    }]
+  }
