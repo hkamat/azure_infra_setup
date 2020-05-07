@@ -46,7 +46,7 @@ resource "azurerm_linux_virtual_machine" "vmmain" {
   resource_group_name   = data.azurerm_resource_group.rg.name
   network_interface_ids = [azurerm_network_interface.networkinterface.id]
   size               = "Standard_DS1_v2"
-  admin_username = "vmadmin"
+  admin_username = "jenkins"
   admin_password = "Welcome@1234"
   computer_name  = "jenkinsSlave1"
 
