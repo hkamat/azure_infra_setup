@@ -1,0 +1,31 @@
+- hosts: localhost
+  connection: local
+  sudo: yes
+
+  vars:
+    jenkins_home: /var/lib/jenkins
+    jenkins_slave_name: jenkinsslave
+    jenkins_username: jenkins
+    jenkins_password: jenkins
+    jenkins_master_pwd: Gyp.s8m
+    jenkins_master_username: admin
+    jenkins_master_url: http://40.87.81.56:8080
+
+# - name: Add the OS specific variables
+#   include_vars: "{{ item }}"
+#   with_first_found:
+#     - "{{ ansible_distribution }}{{ ansible_distribution_major_version }}.yml"
+#     - "{{ ansible_os_family }}.yml"
+#
+  tasks:
+    - name: Print debug message
+      debug:
+        msg: "ansible distribution has value {{ ansible_distribution }}"
+
+    - name: Include postgres centos
+      include_tasks: "postgres_centos.yml"
+      when: ansible_distribution == 'CentOS'
+
+    - name: Include postgresubuntu
+      include_tasks: "jenkins_ubuntu.yml"
+      when: ansible_distribution == 'Ubuntu'

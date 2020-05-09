@@ -1,0 +1,35 @@
+- name: Install Java
+  apt:
+    name: openjdk-8-jdk
+    state: present
+
+- name: Create jenkins user
+  user: name=jenkins password=jenkins comment="Jenkins slave user" home={{jenkins_home}} shell=/bin/bash
+
+- name: Create .ssh folder
+  file: path={{jenkins_home}}/.ssh state=directory mode=0700 owner=jenkins
+
+- name: Add passwordless connection for jenkins
+  authorized_key: user=jenkins key="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCePXXNvZ78nKMdgUyroNeRBBTF5lzfgsi6f2G8X3e0QBjrHQWbOA9o1Mh6kDZXYqW+k0ImkdnIUiUvaUyIaspF6FhDefmBJ2H4339kijkOPStmYqHWJ6l4/PrkRLJuonYJ+lOqpNIK8yb8kZmkZVDElnYP/RKd5/Egn43ddSmAcq+5U7yDLhd8oVNx473AWu52WRZ5sVE4+zlXR1yxl0Qo5ywUeGVHVfPqHPAh4OQtLEoVd1Cd0xmB7UIzjD+yPkiOc6bpDJrZ1JZ8KW1Z05OxsbAKQzb/rh/IHwqUk5ZRzth0nY8NXlMi35qpFxj7L49ed+7Pe+3oPilNSZpOKCAV jenkins@pipelineMaster"
+
+- name: Update authorized_keys rights
+  file: path={{jenkins_home}}/.ssh/authorized_keys state=file mode=0600 owner=jenkins
+
+- name: Create Jenkins slave directory
+  file: path={{jenkins_home}}/jenkins-slave state=directory owner=jenkins
+
+- name: Download Jenkins Swarm Client
+  get_url: dest={{jenkins_home}}/swarm-client-3.9.jar url=https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/3.9/swarm-client-3.9.jar owner=jenkins
+
+- name: copy tomcat service
+  template:
+    src: swarm-client.service.j2
+    dest: /etc/systemd/system/swarm-client.service
+    mode: 0755
+
+- name: Start and enable tomcat
+  service:
+    daemon_reload: yes
+    name: swarm-client
+    state: started
+    enabled: yes
